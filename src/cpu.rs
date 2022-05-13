@@ -1,7 +1,7 @@
 mod opcode;
 mod timers;
 
-use opcode::{execute_opcode, construct_opcodes, Opcodes};
+use opcode::{Opcode, decode_opcode};
 use timers::{update_timers};
 
 // MMAP
@@ -17,7 +17,6 @@ pub struct Cpu {
     sound_timer: u8,
     stack: [u16; 16],
     sp: u16,
-    opcodes: Opcodes,
     pub key: [u8; 16], // State of keyboard
     pub draw_flag: u8,
     pub gfx: [u8; 64 * 32],
@@ -39,7 +38,6 @@ impl Cpu {
             sp: 0,
             key: [0; 16],
             draw_flag: 0,
-            opcodes: construct_opcodes(),
         };
 
         for i in 0..80 {
@@ -60,8 +58,11 @@ impl Cpu {
 
         let opcode: u16 =  left_op | right_op;
 
+        // Decode opcode
+        let decoded_opcode = decode_opcode(opcode);
+
         // Execute opcode
-        execute_opcode(self, opcode);
+        decoded_opcode.execute_opcode(self);
 
         // Update timers
         update_timers(self);
