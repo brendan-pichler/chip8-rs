@@ -6,4 +6,7 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-piston_window = "*"
+device_query = "*"
+piet-common = "0.5.0"
+piet = "0.5.0"
+minifb = "0.23.0"

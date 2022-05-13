@@ -10,15 +10,15 @@ use timers::{update_timers};
 // 0x200-0xFFF - Program ROM and work RAM
 pub struct Cpu {
     memory: [u8; 4096],
-    V: [u8; 16], // General purpose registers, last bit is carry flag
-    I: u16, // Index register
+    v: [u8; 16], // General purpose registers, last bit is carry flag
+    i: u16, // Index register
     pc: u16, // Program counter
     delay_timer: u8,
     sound_timer: u8,
     stack: [u16; 16],
     sp: u16,
-    key: [u8; 16], // State of keyboard
-    draw_flag: u8,
+    pub key: [u8; 16], // State of keyboard
+    pub draw_flag: u8,
     pub gfx: [u8; 64 * 32],
 }
 
@@ -28,8 +28,8 @@ impl Cpu {
         // Initialise registers and memory
         let mut cpu = Cpu {
             memory: [0; 4096],
-            V: [0; 16],
-            I: 0,
+            v: [0; 16],
+            i: 0,
             pc: 0x200,
             gfx: [0; 64 * 32],
             delay_timer: 0,
@@ -40,7 +40,7 @@ impl Cpu {
             draw_flag: 0,
         };
 
-        for i in 0..79 {
+        for i in 0..80 {
             cpu.memory[i] = fontset[i];
         }
 

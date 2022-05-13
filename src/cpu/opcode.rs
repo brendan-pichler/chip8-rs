@@ -24,20 +24,20 @@ pub fn execute_opcode(opcode: Opcode, cpu: &mut Cpu) {
 }
 
 fn mvi(cpu: &mut Cpu, address: u16)  {
-    cpu.I = address;
+    cpu.i = address;
     cpu.pc += 2;
 }
 
 fn display(cpu: &mut Cpu, x: u16, y: u16, height: u16) {
     let mut pixel: u16;
 
-    cpu.V[0xF as usize] = 0;
+    cpu.v[0xF as usize] = 0;
     for y_line in 0..height {
-        pixel = cpu.memory[(cpu.I + y_line) as usize] as u16;
+        pixel = cpu.memory[(cpu.i + y_line) as usize] as u16;
 
-        for x_line in 0..7 {
+        for x_line in 0..8 {
             if (pixel & (0x80 >> x_line)) != 0 {
-                cpu.V[0xF as usize] = 1;
+                cpu.v[0xF as usize] = 1;
             }
             cpu.gfx[(x + x_line + (y + y_line) * 64) as usize] ^= 1;
         }
