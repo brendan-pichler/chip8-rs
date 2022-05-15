@@ -18,7 +18,7 @@ use minifb::Key;
 
 fn main() {
     let filename = Path::new("/Users/bpichler/Documents/rust/chip-8/space_invaders.ch8");
-    let freq: f32 = 2.0;
+    let freq: f32 = 60.;
     // Load program
     let buffer = read(filename).unwrap();
     let fontset = CHIP8_FONTSET.to_vec();
@@ -37,9 +37,9 @@ fn main() {
     while window.is_open() && !window.is_key_down(Key::Escape) {
 
         map_inputs(&window, &mut cpu);
+        cpu.emulate_cycle();
+
         draw_pixels(&mut window, &cpu, &mut draw_buffer);
-        // cpu.emulate_cycle();
-        
     }
 
 }
