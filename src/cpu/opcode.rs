@@ -7,26 +7,42 @@ use functions::*;
 use math::*;
 use timer::*;
 
-type OpFn = fn(&mut Cpu, u16);
+type OpFn = fn(&mut Cpu, &Args);
+
+pub struct Args {
+    x: u16,
+    y: u16,
+    n: u16,
+    nn: u16,
+    nnn: u16,
+}
 
 pub struct Opcode {
-    args: u16,
+    args: Args,
     op_fn: OpFn,
 }
 
 impl Opcode {
+    pub fn new(opcode: u16) -> Self {
+        Opcode {
+            args: Args {
+                x: (0x0F00 & opcode) >> 8,
+                y: (0x00F0 & opcode) >> 4,
+                n: 0x000F & opcode,
+                nn: 0x00FF & opcode,
+                nnn: 0x0FFF & opcode,
+            },
+            op_fn: call,
+        }
+    }
+
     pub fn execute_opcode(&self, cpu: &mut Cpu) {
-        (self.op_fn)(cpu, self.args);
+        (self.op_fn)(cpu, &self.args);
     }
 }
 
 pub fn decode_opcode(opcode: u16) -> Opcode {
-    let mut  d_op = Opcode {
-        args: opcode,
-        op_fn: call,
-    };
-
-    d_op.args = 0x0FFF & opcode;
+    let mut  d_op = Opcode::new(opcode);
 
     match 0xF000 & opcode {
         0x0000 => {
@@ -37,6 +53,7 @@ pub fn decode_opcode(opcode: u16) -> Opcode {
             };
         },
         0x1000 => d_op.op_fn = goto,
+        0x2000 => d_op.op_fn = call_sub,
         0x3000 => d_op.op_fn = skip_eq,
         0x4000 => d_op.op_fn = skip_not_eq,
         0x5000 => d_op.op_fn = skip_reg_eq,

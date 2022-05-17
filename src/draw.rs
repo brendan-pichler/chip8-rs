@@ -30,10 +30,17 @@ pub fn create_window(clock_time: std::time::Duration) -> Window {
     window
 }
 
-pub fn draw_pixels(window: &mut Window, cpu: &Cpu, buffer: &mut Vec<u32>) {
+pub fn draw_pixels(window: &mut Window, cpu: &mut Cpu, buffer: &mut Vec<u32>) {
     if cpu.draw_flag == 1 {
         for i in 0..buffer.len() {
-            let gfx_i = i / 100;
+            let x0 = i % WIDTH;
+            let y0 = i / WIDTH;
+
+            let x1 = x0 / 10;
+            let y1 = y0 / 10;
+
+            let gfx_i = x1 + y1 * 64;
+
             let color: u32;
             if cpu.gfx[gfx_i] == 1 {
                 color = Color::WHITE;
@@ -43,7 +50,9 @@ pub fn draw_pixels(window: &mut Window, cpu: &Cpu, buffer: &mut Vec<u32>) {
             buffer[i] = color;
         }
     }
-    
+
+    cpu.draw_flag = 0;
+
     window
             .update_with_buffer(&buffer, WIDTH, HEIGHT)
             .unwrap();

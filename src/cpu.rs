@@ -1,7 +1,7 @@
 mod opcode;
 mod timers;
 
-use opcode::{Opcode, decode_opcode};
+use opcode::{decode_opcode};
 use timers::{update_timers};
 
 // MMAP
@@ -37,7 +37,7 @@ impl Cpu {
             stack: [0; 16],
             sp: 0,
             key: [0; 16],
-            draw_flag: 0,
+            draw_flag: 1,
         };
 
         for i in 0..80 {
@@ -60,6 +60,8 @@ impl Cpu {
 
         // Decode opcode
         let decoded_opcode = decode_opcode(opcode);
+
+        self.pc += 2;
 
         // Execute opcode
         decoded_opcode.execute_opcode(self);
