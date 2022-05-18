@@ -51,7 +51,7 @@ pub fn draw_pixels(window: &mut Window, cpu: &mut Cpu, buffer: &mut Vec<u32>) {
         }
     }
 
-    cpu.draw_flag = 0;
+    // cpu.draw_flag = 0;
 
     window
             .update_with_buffer(&buffer, WIDTH, HEIGHT)

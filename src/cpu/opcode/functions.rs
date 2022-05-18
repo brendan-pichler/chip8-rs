@@ -2,23 +2,41 @@ use crate::cpu::Cpu;
 use super::Args;
 use rand;
 
-// DXYN	Display	draw(Vx, Vy, N)	Draws a sprite at coordinate (VX, VY) that has a width of 8 pixels and a height of N pixels. Each row of 8 pixels is read as bit-coded starting from memory location I; I value does not change after the execution of this instruction. As described above, VF is set to 1 if any screen pixels are flipped from set to unset when the sprite is drawn, and to 0 if that does not happen
+// DXYN	Display	draw(Vx, Vy, N)	Draws a sprite at coordinate (VX, VY) that has a width of 8 pixels and a height of N pixels. Each row of 8 pixels is read as bit-coded starting 
+// from memory location I; I value does not change after the execution of this instruction. 
+// As described above, VF is set to 1 if any screen pixels are flipped from set to unset when the sprite is drawn, and to 0 if that does not happen
 pub fn display(cpu: &mut Cpu, args: &Args) {
-    let mut pixel: u16;
+    let x_coord = (cpu.v[args.x as usize] % 64) as u16;
+    let y_coord = (cpu.v[args.y as usize] % 32) as u16;
 
     cpu.v[0xF as usize] = 0;
-    for y_line in 0..args.n {
-        pixel = cpu.memory[(cpu.i + y_line) as usize] as u16;
 
-        for x_line in 0..8 {
-            if (pixel & (0x80 >> x_line)) != 0 {
-                cpu.v[0xF as usize] = 1;
+
+    for y in 0..args.n {
+        if y_coord + y > 31 {
+            break;
+        }
+        let sprite_byte = cpu.memory[(cpu.i + y) as usize];
+
+        for x in 0..8 {
+            if x_coord + x > 63 {
+                break;
             }
-            cpu.gfx[(args.x + x_line + (args.y + y_line) * 64) as usize] ^= 1;
+
+            let sprite_pixel: u8 = ((0b10000000 >> x) & sprite_byte) >> (7 - x);
+            let pixel = &mut cpu.gfx[(x_coord + x + (y_coord + y) * 64) as usize];
+
+            if sprite_pixel == 1 {
+                if *pixel == 1 {
+                    *pixel = 0;
+                    cpu.v[0xF as usize] = 1;
+                } else {
+                    *pixel = 1;
+                }
+            }
         }
     }
-
-    cpu.draw_flag = 1;
+    // cpu.draw_flag = 1;
 }
 
 // 1NNN	Flow	goto NNN;	Jumps to address NNN.
