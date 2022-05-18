@@ -62,10 +62,10 @@ impl Cpu {
         let decoded_opcode = decode_opcode(opcode);
 
         self.pc += 2;
-
+        
         // Execute opcode
         decoded_opcode.execute_opcode(self);
-
+        
         // Update timers
         update_timers(self);
     }

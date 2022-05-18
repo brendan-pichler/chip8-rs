@@ -17,7 +17,7 @@ use input::{map_inputs};
 use minifb::Key;
 
 fn main() {
-    let filename = Path::new("/Users/bpichler/Documents/rust/chip-8/IBM_Logo.ch8");
+    let filename = Path::new("/Users/bpichler/Documents/rust/chip-8/space_invaders.ch8");
     let freq: f32 = 60.;
     // Load program
     let buffer = read(filename).unwrap();
@@ -26,7 +26,6 @@ fn main() {
     let mut cpu = Cpu::initialize(&fontset, &buffer);
 
     let clock_time = time::Duration::from_secs_f32(1.0/freq);
-
 
     let mut window = create_window(clock_time);
     let mut draw_buffer: Vec<u32> = vec![0; WIDTH * HEIGHT];
@@ -40,5 +39,4 @@ fn main() {
         cpu.emulate_cycle();
         draw_pixels(&mut window, &mut cpu, &mut draw_buffer);
     }
-
 }

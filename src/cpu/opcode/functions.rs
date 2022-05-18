@@ -6,17 +6,17 @@ use rand;
 // from memory location I; I value does not change after the execution of this instruction. 
 // As described above, VF is set to 1 if any screen pixels are flipped from set to unset when the sprite is drawn, and to 0 if that does not happen
 pub fn display(cpu: &mut Cpu, args: &Args) {
-    let x_coord = (cpu.v[args.x as usize] % 64) as u16;
-    let y_coord = (cpu.v[args.y as usize] % 32) as u16;
+    let x_coord = (cpu.v[args.x] % 64) as u16;
+    let y_coord = (cpu.v[args.y] % 32) as u16;
 
-    cpu.v[0xF as usize] = 0;
+    cpu.v[0xF] = 0;
 
 
     for y in 0..args.n {
-        if y_coord + y > 31 {
+        if y_coord + y as u16 > 31 {
             break;
         }
-        let sprite_byte = cpu.memory[(cpu.i + y) as usize];
+        let sprite_byte = cpu.memory[(cpu.i + y as u16) as usize];
 
         for x in 0..8 {
             if x_coord + x > 63 {
@@ -24,12 +24,12 @@ pub fn display(cpu: &mut Cpu, args: &Args) {
             }
 
             let sprite_pixel: u8 = ((0b10000000 >> x) & sprite_byte) >> (7 - x);
-            let pixel = &mut cpu.gfx[(x_coord + x + (y_coord + y) * 64) as usize];
+            let pixel = &mut cpu.gfx[(x_coord + x + (y_coord + y as u16) * 64) as usize];
 
             if sprite_pixel == 1 {
                 if *pixel == 1 {
                     *pixel = 0;
-                    cpu.v[0xF as usize] = 1;
+                    cpu.v[0xF] = 1;
                 } else {
                     *pixel = 1;
                 }
@@ -46,8 +46,7 @@ pub fn goto(cpu: &mut Cpu, args: &Args) {
 
 // 3XNN	Cond	if (Vx == NN)	Skips the next instruction if VX equals NN. (Usually the next instruction is a jump to skip a code block);
 pub fn skip_eq(cpu: &mut Cpu, args: &Args) {
-
-    if cpu.v[args.x as usize] == args.nn as u8 {
+    if cpu.v[args.x] == args.nn {
         cpu.pc += 2;
     }
 }
@@ -59,7 +58,7 @@ pub fn call(_cpu: &mut Cpu, _args: &Args) {
 
 // 4XNN	Cond	if (Vx != NN)	Skips the next instruction if VX does not equal NN. (Usually the next instruction is a jump to skip a code block);
 pub fn skip_not_eq(cpu: &mut Cpu, args: &Args) {
-    if cpu.v[args.x as usize] != args.nn as u8 {
+    if cpu.v[args.x] != args.nn {
         cpu.pc += 2;
     }
 }
@@ -86,24 +85,24 @@ pub fn ret_sub(cpu: &mut Cpu, _args: &Args) {
 
 // 5XY0	Cond	if (Vx == Vy)	Skips the next instruction if VX equals VY. (Usually the next instruction is a jump to skip a code block);
 pub fn skip_reg_eq(cpu: &mut Cpu, args: &Args) {
-    if cpu.v[args.x as usize] == cpu.v[args.y as usize] {
+    if cpu.v[args.x] == cpu.v[args.y] {
         cpu.pc += 2;
     }
 }
 
 // 6XNN	Const	Vx = NN	Sets VX to NN.
 pub fn set(cpu: &mut Cpu, args: &Args) {
-    cpu.v[args.x as usize] = args.nn as u8;
+    cpu.v[args.x] = args.nn;
 }
 
 // 7XNN	Const	Vx += NN	Adds NN to VX. (Carry flag is not changed);
 pub fn add_const(cpu: &mut Cpu, args: &Args) {
-    cpu.v[args.x as usize] += args.nn as u8;
+    cpu.v[args.x] += args.nn;
 }
 
 // 9XY0	Cond	if (Vx != Vy)	Skips the next instruction if VX does not equal VY. (Usually the next instruction is a jump to skip a code block);
 pub fn not_eq_reg(cpu: &mut Cpu, args: &Args) {
-    if cpu.v[args.x as usize] != cpu.v[args.y as usize] {
+    if cpu.v[args.x] != cpu.v[args.y] {
         cpu.pc += 2;
     }
 }
@@ -115,25 +114,27 @@ pub fn mvi(cpu: &mut Cpu, args: &Args)  {
 
 // BNNN	Flow	PC = V0 + NNN	Jumps to the address NNN plus V0.
 pub fn jmp_offset(cpu: &mut Cpu, args: &Args) {
-    cpu.pc = cpu.v[0 as usize] as u16 + args.nnn;
+    cpu.pc = cpu.v[0] as u16 + args.nnn;
 }
 
 // CXNN	Rand	Vx = rand() & NN	Sets VX to the result of a bitwise and operation on a random number (Typically: 0 to 255) and NN.
 pub fn bitwise_rand(cpu: &mut Cpu, args: &Args) {
     let random: u8 = rand::random::<u8>();
-    cpu.v[args.x as usize] = args.nn as u8 & random;
+    cpu.v[args.x] = args.nn & random;
 }
 
 // EX9E	KeyOp	if (key() == Vx)	Skips the next instruction if the key stored in VX is pressed. (Usually the next instruction is a jump to skip a code block);
 pub fn skip_on_key(cpu: &mut Cpu, args: &Args) {
-    if cpu.key[cpu.v[args.x as usize] as usize] == 1 {
+    let key = cpu.v[args.x];
+    if cpu.key[key as usize] == 1 {
         cpu.pc += 2;
     }
 }
 
 // EXA1	KeyOp	if (key() != Vx)	Skips the next instruction if the key stored in VX is not pressed. (Usually the next instruction is a jump to skip a code block);
 pub fn skip_not_on_key(cpu: &mut Cpu, args: &Args) {
-    if cpu.key[cpu.v[args.x as usize] as usize] != 1 {
+    let key = cpu.v[args.x];
+    if cpu.key[key as usize] != 1 {
         cpu.pc += 2;
     }
 }

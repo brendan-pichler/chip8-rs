@@ -10,10 +10,10 @@ use timer::*;
 type OpFn = fn(&mut Cpu, &Args);
 
 pub struct Args {
-    x: u16,
-    y: u16,
-    n: u16,
-    nn: u16,
+    x: usize,
+    y: usize,
+    n: u8,
+    nn: u8,
     nnn: u16,
 }
 
@@ -26,10 +26,10 @@ impl Opcode {
     pub fn new(opcode: u16) -> Self {
         Opcode {
             args: Args {
-                x: (0x0F00 & opcode) >> 8,
-                y: (0x00F0 & opcode) >> 4,
-                n: 0x000F & opcode,
-                nn: 0x00FF & opcode,
+                x: ((0x0F00 & opcode) >> 8) as usize,
+                y: ((0x00F0 & opcode) >> 4) as usize,
+                n: (0x000F & opcode) as u8,
+                nn: (0x00FF & opcode) as u8,
                 nnn: 0x0FFF & opcode,
             },
             op_fn: call,
