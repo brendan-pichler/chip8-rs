@@ -6,8 +6,5 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-device_query = "*"
-piet-common = "0.5.0"
-piet = "0.5.0"
 minifb = "0.23.0"
 rand = "0.8.5"

@@ -1,11 +1,7 @@
 mod functions;
-mod math;
-mod timer;
 
 use super::Cpu;
 use functions::*;
-use math::*;
-use timer::*;
 
 type OpFn = fn(&mut Cpu, &Args);
 
